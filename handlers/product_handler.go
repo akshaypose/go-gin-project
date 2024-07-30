@@ -2,8 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
+	"go-gin-project/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,15 +21,10 @@ type APIResponse struct {
 }
 
 func GetAllProducts(c *gin.Context) {
-	resp, err := http.Get("https://dummyjson.com/products")
-	if err != nil {
-		fmt.Println("error", err)
-	}
-	defer resp.Body.Close()
+	body, err := utils.MakeCurlCall("GET", "https://dummyjson.com/products")
 
-	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to read Response Body"})
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to make API Call"})
 		return
 	}
 
@@ -50,16 +44,10 @@ func GetAllProducts(c *gin.Context) {
 
 func GetProductByID(c *gin.Context) {
 	id := c.Param("id")
+	body, err := utils.MakeCurlCall("GET", "https://dummyjson.com/products/"+id)
 
-	resp, err := http.Get("https://dummyjson.com/products/" + id)
 	if err != nil {
-		fmt.Println("error", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to read Response Body"})
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to make API Call"})
 		return
 	}
 
